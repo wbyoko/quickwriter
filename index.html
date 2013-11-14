@@ -11,7 +11,7 @@
         <link href="css/bootstrap-3.0.2/css/bootstrap-theme.min.css" rel="stylesheet">
         <link href="css/app.css" rel="stylesheet">
 
-        <script src="js/jquery-1.10.2/jquery-1.10.2.min.js"></script>
+        <!-- <script src="js/jquery-1.10.2/jquery-1.10.2.min.js"></script> -->
         <script src="js/angular-1.2.0/angular.min.js"></script>
         <script src="js/hammer-1.0.5/hammer.min.js"></script>
         <script src="js/hammer-1.0.5/angular-hammer.js"></script>
@@ -24,9 +24,16 @@
                 <div class="btn-group btn-group-justified">
                     <a type="button" class="btn btn-default" ng-click="c.selectAll()">Select All</a>
                     <a type="button" class="btn btn-default" ng-click="c.clearAll()">Clear All</a>
-                    <a type="button" class="btn btn-default" ng-click="c.copyAll()">Copy All</a>
+                    <a type="button" class="btn btn-default" ng-click="c.copyAll()">?123</a>
+                    <a type="button" class="btn btn-default" ng-click="c.logMe($event)>Copy All</a>
                 </div>
-                <svg width="400" height="400" viewBox="0 0 100 100" ng-mouseleave="c.stop()" hm-release="c.stop()">
+                <svg 
+                    width="400" 
+                    height="400" 
+                    viewBox="0 0 100 100" 
+                    ng-mouseleave="c.stop()" 
+                    hm-release="c.stop()" 
+                    ng-mouseup="c.logMe($event)">
 
                     <polygon
                         fill="white"
@@ -56,6 +63,7 @@
                     <circle cx="50" cy="50" r="15" stroke="black" stroke-width="2" 
                         ng-attr-fill="{{c.on() && 'blue' || 'white'}}"
                         hm-hold="c.start()"
+                        hm-options="{hold_timeout:200}"
                         ng-mouseenter="c.on() && c.consume()"/>
 
                     <text x="36" y="32" ng-attr-fill="{{c.cl('s') && 'red' || c.cl('S') && 'blue' || 'gray'}}">s</text>
@@ -107,6 +115,7 @@
                     -->
                 </svg>
                 <div ace-editor="" id="editor" class="xs-col-12"></div>
+                <h6>{{c.aceLength()}}</h6>
             </div>
         </div>
     </body>

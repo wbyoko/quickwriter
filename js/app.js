@@ -161,7 +161,10 @@ app.controller('aceCtrl', function (aceSrvc, quadLtrSrvc) {
         aceSrvc.ace.clearSelection();
     };
 
-
+    this.aceLength = function () {
+        return aceSrvc.ace.session.getValue().length;
+    };
+    
     this.cl = function(letter) {
         return (currLetter === letter);
     };
