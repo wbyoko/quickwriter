@@ -1,5 +1,9 @@
+.writer {
+	width: 400px;
+}
+
 #editor {
     position: absolute;
-    width: 75%;
+    width: 400px;
     height: 200px;
 }

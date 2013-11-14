@@ -1,59 +1,9 @@
-var app = angular.module('qkwrtr', []);
+var app = angular.module('qkwrtr', ['hmTouchEvents']);
 
 app.service('aceSrvc', function () {});
 
-app.directive('aceEditor', function (aceSrvc) {
-    return {
-        link: function (scope, elem, attr) {
-
-            var editor = ace.edit(elem[0]);
-            editor.setTheme("ace/theme/solarized_dark");
-            editor.getSession().setMode("ace/mode/text");
-
-            aceSrvc.ace = editor;
-
-            setTimeout(function () {
-                editor.insert("first");
-            }, 1000);
-            setTimeout(function () {
-                editor.insert("second");
-            }, 5000);
-            setTimeout(function () {
-                editor.insert("third");
-            }, 9000);
-            setTimeout(function () {
-                editor.insert("fourth");
-            }, 13000);
-            setTimeout(function () {
-                editor.insert("fifth");
-            }, 17000);
-            setTimeout(function () {
-                editor.insert("sixth");
-            }, 21000);
-        }
-    };
-});
-
-app.controller('aceCtrl', function (aceSrvc) {
-
-    this.md = false;
-    this.path = '';
-    this.quadArray = [];
-
-    this.addPath = function (quad) {
-
-    };
-
-    this.consume = function () {
-        logMe(path);
-        path = '';
-        quadArray = [];
-    };
-
-    this.logMe = function (e) {
-        console.log(e);
-    };
-
+app.service('quadLtrSrvc', function () {
+    var i, letter;
     var letterToQuadrantSequence = [
         { letter: 'y', path : '12'},
         { letter: 'b', path : '123'},
@@ -129,4 +79,144 @@ app.controller('aceCtrl', function (aceSrvc) {
         { letter: 'H', path : '4321432'},
         { letter: 'J', path : '43214321'}
     ];
+
+    var pathToLetter = {};
+    var letterToPath = {};
+    for (i = letterToQuadrantSequence.length - 1; i >= 0; i--) {
+        letter = letterToQuadrantSequence[i];
+        pathToLetter[letter.path] = letter.letter;
+        letterToPath[letter.letter] = letter.path;
+    }
+
+    this.letterForPath = function(path) {
+        var ltr = pathToLetter[path];
+        if (ltr) return ltr;
+        return '';
+    };
+
+    this.pathForLetter = function(letter) {
+        var ltr = letterToPath[path];
+        if (ltr) return ltr;
+        return false;
+    };
+});
+
+app.directive('aceEditor', function (aceSrvc) {
+    return {
+        link: function (scope, elem, attr) {
+
+            var editor = ace.edit(elem[0]);
+            //editor.setTheme("ace/theme/solarized_dark");
+            //editor.getSession().setMode("ace/mode/text");
+            aceSrvc.ace = editor;
+        }
+    };
+});
+
+app.controller('aceCtrl', function (aceSrvc, quadLtrSrvc) {
+
+    var md = false;
+    var quadArray = [];
+    var currLetter = '';
+    var cq = false;
+    var lq = false;
+
+    var logMe = this.logMe = function (e) {
+        console.log(e);
+    };
+
+    var clearPath = function () {
+        currLetter = '';
+        cq = false;
+        lq = false;
+        quadArray = [];
+        console.log("cleared");
+    };
+
+    this.space = function() {
+        aceSrvc.ace.insert(' ');
+    };
+
+    this.backspace = function() {
+        aceSrvc.ace.remove("left");
+    };
+
+    this.return = function() {
+        aceSrvc.ace.insert('\n');
+    };
+
+    this.selectAll = function() {
+        aceSrvc.ace.selectAll();
+        aceSrvc.ace.focus();
+    };
+
+    this.clearAll = function() {
+        aceSrvc.ace.selectAll();
+        aceSrvc.ace.insert('');
+    };
+
+    this.copyAll = function() {
+        aceSrvc.ace.selectAll();
+        aceSrvc.ace.getCopyText();
+        aceSrvc.ace.clearSelection();
+    };
+
+
+    this.cl = function(letter) {
+        return (currLetter === letter);
+    };
+
+    this.addPath = function (quad) {
+        var path, i;
+
+        if (cq !== quad) {
+            if (lq !== quad) {
+                quadArray.push('' + quad);
+                lq = cq;
+            } else {
+                quadArray.pop();
+                i = quadArray.length;
+                if (i > 1) lq = quadArray[i-2];
+                else lq = false;
+            }
+            cq = quad;
+            path = quadArray.join('');
+            currLetter = quadLtrSrvc.letterForPath(path);
+            if (currLetter === '' && path.length > 8) {
+                quadArray.pop();
+                quadArray.pop();
+                quadArray.pop();
+                quadArray.pop();
+                path = quadArray.join('');
+                currLetter = quadLtrSrvc.letterForPath(path);
+            }
+
+            console.log(lq, cq , path, currLetter);
+        }
+    };
+
+    this.consume = function () {
+        if (currLetter !== '') {
+            aceSrvc.ace.insert(currLetter);
+
+            console.log("consumed");
+        }
+        clearPath();
+    };
+
+    this.start = function () {
+        md = true;
+    };
+
+    this.on = function () {
+        return md;
+    };
+
+    this.stop = function () {
+        if (md && quadArray.length === 0)
+            aceSrvc.ace.insert(' ');
+        md = false;
+        clearPath();
+    };
+
 });

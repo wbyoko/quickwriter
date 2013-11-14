@@ -11,25 +11,42 @@
         <link href="css/bootstrap-3.0.2/css/bootstrap-theme.min.css" rel="stylesheet">
         <link href="css/app.css" rel="stylesheet">
 
-        <script src="js/jquery-1.10.2/jquery.min.js"></script>
+        <script src="js/jquery-1.10.2/jquery-1.10.2.min.js"></script>
         <script src="js/angular-1.2.0/angular.min.js"></script>
-        <script src="js/ace-builds-master/src-min/ace.js" type="text/javascript" charset="utf-8"></script>
-        <script src="js/app.js" type="text/javascript" charset="utf-8"></script>
+        <script src="js/hammer-1.0.5/hammer.min.js"></script>
+        <script src="js/hammer-1.0.5/angular-hammer.js"></script>
+        <script src="js/ace-builds-master/src-min/ace.js"></script>
+        <script src="js/app.js"></script>
     </head>
     <body ng-app="qkwrtr">
-        <div class="container" ng-controller="aceCtrl as c">
+        <div class="writer container" ng-controller="aceCtrl as c">
             <div class="row">
                 <div class="btn-group btn-group-justified">
-                    <a type="button" class="btn btn-default">Select All</a>
-                    <a type="button" class="btn btn-default">Clear All</a>
-                    <a type="button" class="btn btn-default">Copy All</a>
+                    <a type="button" class="btn btn-default" ng-click="c.selectAll()">Select All</a>
+                    <a type="button" class="btn btn-default" ng-click="c.clearAll()">Clear All</a>
+                    <a type="button" class="btn btn-default" ng-click="c.copyAll()">Copy All</a>
                 </div>
-                <svg width="300" height="300" viewBox="0 0 100 100" ng-mouseup="c.md = false">
+                <svg width="400" height="400" viewBox="0 0 100 100" ng-mouseleave="c.stop()" hm-release="c.stop()">
 
-                    <polyline points="0,0 50,50 100,0 0,0" ng-mouseenter="c.addPath('1')"/>
-                    <polyline points="100,0 50,50 100,100 100,0" ng-mouseenter="c.addPath('2')"/>
-                    <polyline points="100,100 50,50 0,100 100,100"  ng-mouseenter="c.addPath('3')"/>
-                    <polyline points="0,100 50,50 0,0 0,100" ng-mouseenter="c.addPath('4')"/>
+                    <polygon
+                        fill="white"
+                        points="0,0 50,50 100,0" 
+                        ng-mouseenter="c.on() && c.addPath('1')"
+                        ng-click="c.return()"/>
+                    <polygon
+                        fill="white"
+                        points="100,0 50,50 100,100" 
+                        ng-mouseenter="c.on() && c.addPath('2')"
+                        ng-click="c.backspace()"/>
+                    <polygon 
+                        fill="white"
+                        points="100,100 50,50 0,100"  
+                        ng-mouseenter="c.on() && c.addPath('3')"/>
+                    <polygon 
+                        fill="white"
+                        points="0,100 50,50 0,0" 
+                        ng-mouseenter="c.on() && c.addPath('4')"
+                        ng-click="c.space()"/>
 
                     <line x1="50" y1="50" x2="0" y2="0" stroke="blue" stroke-width="3"/>
                     <line x1="50" y1="50" x2="0" y2="100" stroke="red" stroke-width="3"/>
@@ -37,49 +54,49 @@
                     <line x1="50" y1="50" x2="100" y2="0" stroke="green" stroke-width="3"/>
 
                     <circle cx="50" cy="50" r="15" stroke="black" stroke-width="2" 
-                        ng-attr-fill="{{c.md && 'blue' || 'white'}}"
-                        ng-click="c.md = true" 
-                        ng-mouseenter="c.consume()"/>
+                        ng-attr-fill="{{c.on() && 'blue' || 'white'}}"
+                        hm-hold="c.start()"
+                        ng-mouseenter="c.on() && c.consume()"/>
 
-                    <text x="36" y="32" fill="gray">s</text>
-                    <text x="26" y="23" fill="gray">d</text>
-                    <text x="18" y="12" fill="gray">g</text>
-                    <text x="12" y="8" fill="gray">'</text>
+                    <text x="36" y="32" ng-attr-fill="{{c.cl('s') && 'red' || c.cl('S') && 'blue' || 'gray'}}">s</text>
+                    <text x="26" y="23" ng-attr-fill="{{c.cl('d') && 'red' || c.cl('D') && 'blue' || 'gray'}}">d</text>
+                    <text x="18" y="12" ng-attr-fill="{{c.cl('g') && 'red' || c.cl('G') && 'blue' || 'gray'}}">g</text>
+                    <text x="12" y="8"  ng-attr-fill="{{c.cl('\'') && 'red' || 'gray'}}">'</text>
 
-                    <text x="26" y="45" fill="gray">t</text>
-                    <text x="16" y="36" fill="gray">c</text>
-                    <text x="8" y="26" fill="gray">z</text>
-                    <text x="0" y="12" fill="gray">.</text>
+                    <text x="26" y="45" ng-attr-fill="{{c.cl('t') && 'red' || c.cl('T') && 'blue' || 'gray'}}">t</text>
+                    <text x="16" y="36" ng-attr-fill="{{c.cl('c') && 'red' || c.cl('C') && 'blue' || 'gray'}}">c</text>
+                    <text x="8"  y="26" ng-attr-fill="{{c.cl('z') && 'red' || c.cl('Z') && 'blue' || 'gray'}}">z</text>
+                    <text x="0"  y="12" ng-attr-fill="{{c.cl('.') && 'red' || 'gray'}}">.</text>
 
-                    <text x="56" y="32" fill="gray">y</text>
-                    <text x="64" y="26" fill="gray">b</text>
-                    <text x="72" y="16" fill="gray">p</text>
-                    <text x="78" y="8" fill="gray">q</text>
+                    <text x="56" y="32" ng-attr-fill="{{c.cl('y') && 'red' || c.cl('Y') && 'blue' || 'gray'}}">y</text>
+                    <text x="64" y="26" ng-attr-fill="{{c.cl('b') && 'red' || c.cl('B') && 'blue' || 'gray'}}">b</text>
+                    <text x="72" y="16" ng-attr-fill="{{c.cl('p') && 'red' || c.cl('P') && 'blue' || 'gray'}}">p</text>
+                    <text x="78" y="8"  ng-attr-fill="{{c.cl('q') && 'red' || c.cl('Q') && 'blue' || 'gray'}}">q</text>
 
-                    <text x="66" y="45" fill="gray">a</text>
-                    <text x="76" y="36" fill="gray">r</text>
-                    <text x="84" y="26" fill="gray">x</text>
-                    <text x="92" y="20" fill="gray">?</text>
+                    <text x="66" y="45" ng-attr-fill="{{c.cl('a') && 'red' || c.cl('A') && 'blue' || 'gray'}}">a</text>
+                    <text x="76" y="36" ng-attr-fill="{{c.cl('r') && 'red' || c.cl('R') && 'blue' || 'gray'}}">r</text>
+                    <text x="84" y="26" ng-attr-fill="{{c.cl('x') && 'red' || c.cl('X') && 'blue' || 'gray'}}">x</text>
+                    <text x="92" y="20" ng-attr-fill="{{c.cl('?') && 'red' || 'gray'}}">?</text>
 
-                    <text x="67" y="62" fill="gray">n</text>
-                    <text x="76" y="72" fill="gray">m</text>
-                    <text x="88" y="84" fill="gray">f</text>
-                    <text x="94" y="92" fill="gray">!</text>
+                    <text x="67" y="62" ng-attr-fill="{{c.cl('n') && 'red' || c.cl('N') && 'blue' || 'gray'}}">n</text>
+                    <text x="76" y="72" ng-attr-fill="{{c.cl('m') && 'red' || c.cl('M') && 'blue' || 'gray'}}">m</text>
+                    <text x="88" y="84" ng-attr-fill="{{c.cl('f') && 'red' || c.cl('F') && 'blue' || 'gray'}}">f</text>
+                    <text x="94" y="92" ng-attr-fill="{{c.cl('!') && 'red' || 'gray'}}">!</text>
 
-                    <text x="56" y="72" fill="gray">o</text>
-                    <text x="64" y="82" fill="gray">u</text>
-                    <text x="72" y="92" fill="gray">v</text>
-                    <text x="78" y="100" fill="gray">w</text>
+                    <text x="56" y="74" ng-attr-fill="{{c.cl('o') && 'red' || c.cl('O') && 'blue' || 'gray'}}">o</text>
+                    <text x="64" y="82" ng-attr-fill="{{c.cl('u') && 'red' || c.cl('U') && 'blue' || 'gray'}}">u</text>
+                    <text x="72" y="92" ng-attr-fill="{{c.cl('v') && 'red' || c.cl('V') && 'blue' || 'gray'}}">v</text>
+                    <text x="78" y="100"ng-attr-fill="{{c.cl('w') && 'red' || c.cl('W') && 'blue' || 'gray'}}">w</text>
 
-                    <text x="36" y="72" fill="gray">e</text>
-                    <text x="32" y="82" fill="gray">l</text>
-                    <text x="24" y="90" fill="gray">k</text>
-                    <text x="10" y="99" fill="gray">@</text>
+                    <text x="36" y="74" ng-attr-fill="{{c.cl('e') && 'red' || c.cl('E') && 'blue' || 'gray'}}">e</text>
+                    <text x="32" y="82" ng-attr-fill="{{c.cl('l') && 'red' || c.cl('L') && 'blue' || 'gray'}}">l</text>
+                    <text x="24" y="91" ng-attr-fill="{{c.cl('k') && 'red' || c.cl('K') && 'blue' || 'gray'}}">k</text>
+                    <text x="12" y="100"ng-attr-fill="{{c.cl('@') && 'red' || 'gray'}}">@</text>
 
-                    <text x="26" y="62" fill="gray">i</text>
-                    <text x="16" y="72" fill="gray">h</text>
-                    <text x="10" y="82" fill="gray">j</text>
-                    <text x="0" y="92" fill="gray">,</text>   
+                    <text x="26" y="62" ng-attr-fill="{{c.cl('i') && 'red' || c.cl('I') && 'blue' || 'gray'}}">i</text>
+                    <text x="16" y="72" ng-attr-fill="{{c.cl('h') && 'red' || c.cl('H') && 'blue' || 'gray'}}">h</text>
+                    <text x="10" y="82" ng-attr-fill="{{c.cl('j') && 'red' || c.cl('J') && 'blue' || 'gray'}}">j</text>
+                    <text x="0"  y="92" ng-attr-fill="{{c.cl(',') && 'red' || 'gray'}}">,</text>   
 
                     <!--
                     <text x="20" y="20" stroke="gray">return</text>
@@ -89,12 +106,7 @@
                     <text x="20" y="20" stroke="gray">text-to-speech</text> 
                     -->
                 </svg>
-                <div ace-editor="" id="editor" class="xs-col-12">
-                    function foo(items) {
-                        var x = "All this is syntax highlighted";
-                        return x;
-                    }
-                </div>
+                <div ace-editor="" id="editor" class="xs-col-12"></div>
             </div>
         </div>
     </body>
