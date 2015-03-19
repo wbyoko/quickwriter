@@ -90,24 +90,19 @@ app.service('quadLtrSrvc', function () {
 
     this.letterForPath = function(path) {
         var ltr = pathToLetter[path];
-        if (ltr) return ltr;
-        return '';
+        return ltr || '';
     };
 
     this.pathForLetter = function(letter) {
         var ltr = letterToPath[path];
-        if (ltr) return ltr;
-        return false;
+        return ltr || false;
     };
 });
 
 app.directive('aceEditor', function (aceSrvc) {
     return {
         link: function (scope, elem, attr) {
-
             var editor = ace.edit(elem[0]);
-            //editor.setTheme("ace/theme/solarized_dark");
-            //editor.getSession().setMode("ace/mode/text");
             aceSrvc.ace = editor;
         }
     };
@@ -130,7 +125,6 @@ app.controller('aceCtrl', function (aceSrvc, quadLtrSrvc) {
         cq = false;
         lq = false;
         quadArray = [];
-        console.log("cleared");
     };
 
     this.space = function() {
@@ -193,16 +187,12 @@ app.controller('aceCtrl', function (aceSrvc, quadLtrSrvc) {
                 path = quadArray.join('');
                 currLetter = quadLtrSrvc.letterForPath(path);
             }
-
-            console.log(lq, cq , path, currLetter);
         }
     };
 
     this.consume = function () {
         if (currLetter !== '') {
             aceSrvc.ace.insert(currLetter);
-
-            console.log("consumed");
         }
         clearPath();
     };
