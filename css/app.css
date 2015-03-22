@@ -9,3 +9,5 @@ body {
     width: 400px;
     height: 100px;
 }
+
+svg text::selection { background: none; }
