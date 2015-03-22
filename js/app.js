@@ -1,6 +1,42 @@
 var app = angular.module('qkwrtr', ['hmTouchEvents']);
 
-app.service('aceSrvc', function () {});
+app.service('aceSrvc', function () {
+    var _ace;
+
+    this.setAce = function (ace) {
+        _ace = ace;
+    }
+
+    this.space = function() {
+        _ace.insert(' ');
+    };
+
+    this.backspace = function() {
+        _ace.remove("left");
+    };
+
+    this.return = function() {
+        _ace.insert('\n');
+    };
+
+    this.selectAll = function() {
+        _ace.selectAll();
+        _ace.focus();
+    };
+
+    this.clearAll = function() {
+        _ace.selectAll();
+        _ace.insert('');
+    };
+
+    this.length = function () {
+        return _ace.session.getValue().length;
+    };
+
+    this.insert = function (text) {
+        _ace.insert(text);
+    };
+});
 
 app.service('quadLtrSrvc', function () {
     var i, letter;
@@ -103,7 +139,7 @@ app.directive('aceEditor', function (aceSrvc) {
     return {
         link: function (scope, elem, attr) {
             var editor = ace.edit(elem[0]);
-            aceSrvc.ace = editor;
+            aceSrvc.setAce(editor);
         }
     };
 });
@@ -116,10 +152,6 @@ app.controller('aceCtrl', function (aceSrvc, quadLtrSrvc) {
     var cq = false;
     var lq = false;
 
-    var logMe = this.logMe = function (e) {
-        console.log(e);
-    };
-
     var clearPath = function () {
         currLetter = '';
         cq = false;
@@ -127,63 +159,31 @@ app.controller('aceCtrl', function (aceSrvc, quadLtrSrvc) {
         quadArray = [];
     };
 
-    this.space = function() {
-        aceSrvc.ace.insert(' ');
-    };
-
-    this.backspace = function() {
-        aceSrvc.ace.remove("left");
-    };
-
-    this.return = function() {
-        aceSrvc.ace.insert('\n');
-    };
-
-    this.selectAll = function() {
-        aceSrvc.ace.selectAll();
-        aceSrvc.ace.focus();
-    };
-
-    this.clearAll = function() {
-        aceSrvc.ace.selectAll();
-        aceSrvc.ace.insert('');
-    };
-
-    this.copyAll = function() {
-        aceSrvc.ace.selectAll();
-        aceSrvc.ace.getCopyText();
-        aceSrvc.ace.clearSelection();
-    };
-
-    this.aceLength = function () {
-        return aceSrvc.ace.session.getValue().length;
-    };
+    this.ace = aceSrvc;
     
     this.cl = function(letter) {
         return (currLetter === letter);
     };
 
     this.addPath = function (quad) {
-        var path, i;
+        var path, len;
 
         if (cq !== quad) {
             if (lq !== quad) {
-                quadArray.push('' + quad);
+                quadArray.push(quad);
                 lq = cq;
             } else {
                 quadArray.pop();
-                i = quadArray.length;
-                if (i > 1) lq = quadArray[i-2];
-                else lq = false;
+                len = quadArray.length;
+                lq = len > 1 ? quadArray[len - 2] : false;
             }
             cq = quad;
             path = quadArray.join('');
             currLetter = quadLtrSrvc.letterForPath(path);
-            if (currLetter === '' && path.length > 8) {
-                quadArray.pop();
-                quadArray.pop();
-                quadArray.pop();
-                quadArray.pop();
+
+            // For non-capital punctuation & double looped caps
+            if (currLetter === '' && quadArray.length > 8) {
+                quadArray.splice(0, 4);
                 path = quadArray.join('');
                 currLetter = quadLtrSrvc.letterForPath(path);
             }
@@ -192,7 +192,7 @@ app.controller('aceCtrl', function (aceSrvc, quadLtrSrvc) {
 
     this.consume = function () {
         if (currLetter !== '') {
-            aceSrvc.ace.insert(currLetter);
+            aceSrvc.insert(currLetter);
         }
         clearPath();
     };
@@ -207,7 +207,7 @@ app.controller('aceCtrl', function (aceSrvc, quadLtrSrvc) {
 
     this.stop = function () {
         if (md && quadArray.length === 0)
-            aceSrvc.ace.insert(' ');
+            aceSrvc.insert(' ');
         md = false;
         clearPath();
     };

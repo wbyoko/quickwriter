@@ -21,28 +21,26 @@
         <div class="writer container" ng-controller="aceCtrl as c">
             <div class="row">
                 <div class="btn-group btn-group-justified">
-                    <a type="button" class="btn btn-default" ng-click="c.selectAll()">Select All</a>
-                    <a type="button" class="btn btn-default" ng-click="c.clearAll()">Clear All</a>
-                    <a type="button" class="btn btn-default" ng-click="c.copyAll()">Copy All</a>
+                    <a type="button" class="btn btn-default" ng-click="c.ace.selectAll()">Select All</a>
+                    <a type="button" class="btn btn-default" ng-click="c.ace.clearAll()">Clear All</a>
                 </div>
                 <svg 
                     width="400" 
                     height="400" 
                     viewBox="0 0 100 100" 
                     ng-mouseleave="c.stop()" 
-                    hm-release="c.stop()" 
-                    ng-mouseup="c.logMe($event)">
+                    ng-mouseup="c.stop()">
 
                     <polygon
                         fill="white"
                         points="0,0 50,50 100,0" 
                         ng-mouseenter="c.on() && c.addPath('1')"
-                        ng-click="c.return()"/>
+                        ng-click="c.ace.return()"/>
                     <polygon
                         fill="white"
                         points="100,0 50,50 100,100" 
                         ng-mouseenter="c.on() && c.addPath('2')"
-                        ng-click="c.backspace()"/>
+                        ng-click="c.ace.backspace()"/>
                     <polygon 
                         fill="white"
                         points="100,100 50,50 0,100"  
@@ -51,7 +49,7 @@
                         fill="white"
                         points="0,100 50,50 0,0" 
                         ng-mouseenter="c.on() && c.addPath('4')"
-                        ng-click="c.space()"/>
+                        ng-click="c.ace.space()"/>
 
                     <line x1="50" y1="50" x2="0" y2="0" stroke="blue" stroke-width="3"/>
                     <line x1="50" y1="50" x2="0" y2="100" stroke="red" stroke-width="3"/>
@@ -102,22 +100,14 @@
                     <text x="26" y="62" ng-attr-fill="{{c.cl('i') && 'red' || c.cl('I') && 'blue' || 'gray'}}">i</text>
                     <text x="16" y="72" ng-attr-fill="{{c.cl('h') && 'red' || c.cl('H') && 'blue' || 'gray'}}">h</text>
                     <text x="10" y="82" ng-attr-fill="{{c.cl('j') && 'red' || c.cl('J') && 'blue' || 'gray'}}">j</text>
-                    <text x="0"  y="92" ng-attr-fill="{{c.cl(',') && 'red' || 'gray'}}">,</text>   
-
-                    <!--
-                    <text x="20" y="20" stroke="gray">return</text>
-                    <text x="20" y="20" stroke="gray">?123</text>
-                    <text x="20" y="20" stroke="gray">backspace</text>
-                    <text x="20" y="20" stroke="gray">enter</text>
-                    <text x="20" y="20" stroke="gray">text-to-speech</text> 
-                    -->
+                    <text x="0"  y="92" ng-attr-fill="{{c.cl(',') && 'red' || 'gray'}}">,</text>
                 </svg>
             </div>
             <div class="row editor">
                 <div ace-editor="" class="editor" class="xs-col-12"></div>
             </div>
             <div class="row">
-                <h6>{{c.aceLength()}}</h6>
+                <h6>{{c.ace.length()}}</h6>
             </div>
         </div>
     </body>
