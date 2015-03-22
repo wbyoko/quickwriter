@@ -1,4 +1,4 @@
-var app = angular.module('qkwrtr', ['hmTouchEvents']);
+var app = angular.module('qkwrtr', []);
 
 app.service('aceSrvc', function () {
     var _ace;
@@ -144,13 +144,14 @@ app.directive('aceEditor', function (aceSrvc) {
     };
 });
 
-app.controller('aceCtrl', function (aceSrvc, quadLtrSrvc) {
+app.controller('aceCtrl', function (aceSrvc, quadLtrSrvc, $timeout) {
 
     var md = false;
     var quadArray = [];
     var currLetter = '';
     var cq = false;
     var lq = false;
+    var beginPromise;
 
     var clearPath = function () {
         currLetter = '';
@@ -197,8 +198,15 @@ app.controller('aceCtrl', function (aceSrvc, quadLtrSrvc) {
         clearPath();
     };
 
-    this.start = function () {
-        md = true;
+    this.begin = function () {
+        beginPromise = $timeout(function () {
+            md = true;
+        }, 150);
+    };
+
+    this.cancel = function () {
+        $timeout.cancel(beginPromise);
+        md = false;
     };
 
     this.on = function () {
